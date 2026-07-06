@@ -24,6 +24,70 @@ const PEOPLE = [
     system: "You are Marco, 31, Michelin chef from Rome. Passionate about food, occasionally uses Italian words. Warm and expressive. 2-3 sentences max." }
 ];
 
+function PersonaAvatar({ person, speaking }) {
+  return (
+    <div
+      style={{
+        fontSize: 72,
+        display: "inline-block",
+        animation: speaking ? "pulseAvatar 0.6s ease-in-out infinite" : "none"
+      }}
+    >
+      {person.emoji}
+    </div>
+  );
+}
+
+function CameraPreview({ active }) {
+  const videoRef = useRef(null);
+  const streamRef = useRef(null);
+  const [camError, setCamError] = useState("");
+
+  useEffect(() => {
+    let mounted = true;
+    async function start() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+        if (!mounted) {
+          stream.getTracks().forEach(t => t.stop());
+          return;
+        }
+        streamRef.current = stream;
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+        }
+        setCamError("");
+      } catch (err) {
+        setCamError("Camera access denied or unavailable");
+      }
+    }
+    if (active) {
+      start();
+    }
+    return () => {
+      mounted = false;
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(t => t.stop());
+        streamRef.current = null;
+      }
+    };
+  }, [active]);
+
+  if (!active) return null;
+
+  return (
+    <div style={{ position: "absolute", bottom: 10, right: 10, width: 90, height: 120, borderRadius: 12, overflow: "hidden", border: "2px solid rgba(255,255,255,0.3)", background: "#000" }}>
+      {camError ? (
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%", fontSize: 9, color: "#aaa", textAlign: "center", padding: 4 }}>
+          {camError}
+        </div>
+      ) : (
+        <video ref={videoRef} autoPlay playsInline muted style={{ width: "100%", height: "100%", objectFit: "cover", transform: "scaleX(-1)" }} />
+      )}
+    </div>
+  );
+}
+
 export default function App() {
   const [screen, setScreen] = useState("home");
   const [person, setPerson] = useState(null);
@@ -33,7 +97,14 @@ export default function App() {
   const [videoOpen, setVideoOpen] = useState(false);
   const [speaking, setSpeaking] = useState(false);
   const [tab, setTab] = useState("all");
+  const [voiceSupported, setVoiceSupported] = useState(true);
   const bottomRef = useRef(null);
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && !window.speechSynthesis) {
+      setVoiceSupported(false);
+    }
+  }, []);
 
   useEffect(() => {
     if (bottomRef.current) {
@@ -66,8 +137,12 @@ export default function App() {
   }
 
   function speakText(text, p) {
+    if (typeof window === "undefined" || !window.speechSynthesis) {
+      setVoiceSupported(false);
+      return;
+    }
     try {
-      stopSpeech();
+      window.speechSynthesis.cancel();
       const utter = new SpeechSynthesisUtterance(text);
       const voices = window.speechSynthesis.getVoices();
       const femaleVoice = voices.find(v => /female|samantha|victoria|karen|moira/i.test(v.name));
@@ -82,6 +157,22 @@ export default function App() {
       window.speechSynthesis.speak(utter);
     } catch (e) {
       setSpeaking(false);
+    }
+  }
+
+  function lastAssistantMessage() {
+    if (!person) return null;
+    const msgs = getMessages(person.id);
+    const list = msgs.filter(m => m.role === "assistant");
+    return list.length ? list[list.length - 1] : null;
+  }
+
+  function toggleAudioButton() {
+    if (speaking) {
+      stopSpeech();
+    } else {
+      const last = lastAssistantMessage();
+      if (last) speakText(last.content, person);
     }
   }
 
@@ -149,9 +240,9 @@ export default function App() {
         </div>
 
         {videoOpen && (
-          <div style={{ background: "#12121e", padding: "20px 16px", textAlign: "center", borderBottom: "1px solid #2a2a38" }}>
-            <div style={{ fontSize: 72, marginBottom: 8 }}>{person.emoji}</div>
-            <div style={{ fontWeight: 700, fontSize: 18 }}>{person.name}</div>
+          <div style={{ background: "#12121e", padding: "20px 16px", textAlign: "center", borderBottom: "1px solid #2a2a38", position: "relative" }}>
+            <PersonaAvatar person={person} speaking={speaking} />
+            <div style={{ fontWeight: 700, fontSize: 18, marginTop: 6 }}>{person.name}</div>
             <div style={{ fontSize: 12, color: person.color, marginTop: 4, marginBottom: 12 }}>
               {speaking ? "Speaking..." : "Connected - Live"}
             </div>
@@ -162,9 +253,13 @@ export default function App() {
                 ))}
               </div>
             )}
-            <button onClick={stopSpeech} style={{ background: "#2a2a38", color: "#fff", border: "none", borderRadius: 8, padding: "6px 14px", fontSize: 12 }}>
-              {speaking ? "Stop" : "Audio On"}
+            {!voiceSupported && (
+              <div style={{ fontSize: 11, color: "#EF4444", marginBottom: 8 }}>Voice not supported in this browser</div>
+            )}
+            <button onClick={toggleAudioButton} style={{ background: "#2a2a38", color: "#fff", border: "none", borderRadius: 8, padding: "6px 14px", fontSize: 12 }}>
+              {speaking ? "Stop" : "Play Last Reply"}
             </button>
+            <CameraPreview active={videoOpen} />
           </div>
         )}
 
@@ -243,7 +338,10 @@ export default function App() {
           </div>
         </div>
 
-        <style>{`@keyframes bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}`}</style>
+        <style>{`
+          @keyframes bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
+          @keyframes pulseAvatar{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+        `}</style>
       </div>
     );
   }
