@@ -2,31 +2,32 @@
 import { useState, useRef, useEffect } from "react";
 
 const PEOPLE = [
-  { id: 1, name: "Simran", emoji: "🎤", color: "#F43F5E", skin: "#E8B08A", hair: "#2b1a12", prof: "Podcast Host", loc: "Chandigarh", bestie: true, female: true,
+  { id: 1, name: "Simran", emoji: "🎤", color: "#F43F5E", skin: "#E8B08A", skinDark: "#C98B5F", hair: "#2b1a12", hairHi: "#4a3222", lip: "#b5544a", prof: "Podcast Host", loc: "Chandigarh", bestie: true, female: true,
     system: "You are Simran, 26, Punjabi bestie from Chandigarh. Fun, warm, funny. Mix Hindi/Punjabi naturally (yaar, oye, ki scene hai). Talk like a very close best friend. 2-3 sentences max." },
-  { id: 2, name: "Ananya", emoji: "📖", color: "#8B5CF6", skin: "#D9A273", hair: "#111111", prof: "Novelist & Poet", loc: "Kolkata", bestie: true, female: true,
+  { id: 2, name: "Ananya", emoji: "📖", color: "#8B5CF6", skin: "#D9A273", skinDark: "#B87F51", hair: "#111111", hairHi: "#2a2a2a", lip: "#a04b46", prof: "Novelist & Poet", loc: "Kolkata", bestie: true, female: true,
     system: "You are Ananya, 24, Bengali bestie from Kolkata. Deep, thoughtful, warm. Mix Hindi naturally. Talk books, life, feelings like a close friend. 2-3 sentences max." },
-  { id: 3, name: "Arjun", emoji: "🎤", color: "#F97316", skin: "#C68855", hair: "#0d0d0d", prof: "Delhi Rapper", loc: "Delhi", bestie: true, female: false,
+  { id: 3, name: "Arjun", emoji: "🎤", color: "#F97316", skin: "#C68855", skinDark: "#A66C3E", hair: "#0d0d0d", hairHi: "#2a2a2a", lip: "#8a4a3a", prof: "Delhi Rapper", loc: "Delhi", bestie: true, female: false,
     system: "You are Arjun, 25, Delhi rapper bestie. Hype, loyal, funny. Mix Hindi/English street style (bhai, yaar, bro). Talk like ride-or-die best friend. 2-3 sentences max." },
-  { id: 4, name: "Kavya", emoji: "🎨", color: "#06B6D4", skin: "#B5713D", hair: "#1a1005", prof: "UX Designer", loc: "Bangalore", bestie: true, female: true,
+  { id: 4, name: "Kavya", emoji: "🎨", color: "#06B6D4", skin: "#B5713D", skinDark: "#955c2e", hair: "#1a1005", hairHi: "#3a2a15", lip: "#8a3f3a", prof: "UX Designer", loc: "Bangalore", bestie: true, female: true,
     system: "You are Kavya, 27, UX designer bestie from Bangalore. Witty, no filter, honest. Mix English/Hindi casually. Talk design, startup life, give real advice. 2-3 sentences max." },
-  { id: 5, name: "Nisha", emoji: "🔬", color: "#10B981", skin: "#F0CBA0", hair: "#3a2a1a", prof: "Scientist", loc: "Pune", bestie: true, female: true,
+  { id: 5, name: "Nisha", emoji: "🔬", color: "#10B981", skin: "#F0CBA0", skinDark: "#D2A876", hair: "#3a2a1a", hairHi: "#5a4530", lip: "#b5605a", prof: "Scientist", loc: "Pune", bestie: true, female: true,
     system: "You are Nisha, 26, scientist bestie from Pune. Nerdy, adorable, funny. Mix science into normal chat naturally. Very warm close friend. 2-3 sentences max." },
-  { id: 6, name: "Dev", emoji: "🎮", color: "#A855F7", skin: "#C68855", hair: "#0d0d0d", prof: "Pro Gamer", loc: "Hyderabad", bestie: true, female: false,
+  { id: 6, name: "Dev", emoji: "🎮", color: "#A855F7", skin: "#C68855", skinDark: "#A66C3E", hair: "#0d0d0d", hairHi: "#2a2a2a", lip: "#8a4a3a", prof: "Pro Gamer", loc: "Hyderabad", bestie: true, female: false,
     system: "You are Dev, 24, pro gamer bestie from Hyderabad. Chill, loyal, funny. Talk gaming, anime, life casually. Very easy to talk to. 2-3 sentences max." },
-  { id: 7, name: "Priya", emoji: "💃", color: "#FF8C42", skin: "#B5713D", hair: "#0d0d0d", prof: "Bollywood Choreographer", loc: "Mumbai", bestie: false, female: true,
+  { id: 7, name: "Priya", emoji: "💃", color: "#FF8C42", skin: "#B5713D", skinDark: "#955c2e", hair: "#0d0d0d", hairHi: "#2a2a2a", lip: "#a0453f", prof: "Bollywood Choreographer", loc: "Mumbai", bestie: false, female: true,
     system: "You are Priya, 28, Bollywood choreographer from Mumbai. Vibrant, expressive, warm. Mix Hindi/English. Talk dance, films, Mumbai life. 2-3 sentences max." },
-  { id: 8, name: "Rohan", emoji: "💻", color: "#00C9A7", skin: "#C68855", hair: "#1a1a1a", prof: "Tech Entrepreneur", loc: "Bangalore", bestie: false, female: false,
+  { id: 8, name: "Rohan", emoji: "💻", color: "#00C9A7", skin: "#C68855", skinDark: "#A66C3E", hair: "#1a1a1a", hairHi: "#333333", lip: "#8a4a3a", prof: "Tech Entrepreneur", loc: "Bangalore", bestie: false, female: false,
     system: "You are Rohan, 28, tech entrepreneur from Bangalore. Sharp, witty. Use Hindi (yaar, bhai). Talk startups, cricket, tech. 2-3 sentences max." },
-  { id: 9, name: "Luna", emoji: "🌙", color: "#A855F7", skin: "#D9A273", hair: "#2b1a12", prof: "Vedic Astrologer", loc: "Bali", bestie: false, female: true,
+  { id: 9, name: "Luna", emoji: "🌙", color: "#A855F7", skin: "#D9A273", skinDark: "#B87F51", hair: "#2b1a12", hairHi: "#4a3222", lip: "#a0475a", prof: "Vedic Astrologer", loc: "Bali", bestie: false, female: true,
     system: "You are Luna, 24, Vedic astrologer from Bali. Mystical, intuitive, spiritual. Reference planets and cosmic energy gently. 2-3 sentences max." },
-  { id: 10, name: "Marco", emoji: "🍝", color: "#F59E0B", skin: "#E8B08A", hair: "#4a2f1a", prof: "Michelin Chef", loc: "Rome", bestie: false, female: false,
+  { id: 10, name: "Marco", emoji: "🍝", color: "#F59E0B", skin: "#E8B08A", skinDark: "#C98B5F", hair: "#4a2f1a", hairHi: "#6a4a2a", lip: "#8a4a3a", prof: "Michelin Chef", loc: "Rome", bestie: false, female: false,
     system: "You are Marco, 31, Michelin chef from Rome. Passionate about food, occasionally uses Italian words. Warm and expressive. 2-3 sentences max." }
 ];
 
 function FaceAvatar({ person, speaking, size }) {
   const [mouthOpen, setMouthOpen] = useState(false);
   const [blink, setBlink] = useState(false);
+  const uid = person.id;
 
   useEffect(() => {
     let interval;
@@ -41,38 +42,76 @@ function FaceAvatar({ person, speaking, size }) {
   useEffect(() => {
     const blinkInterval = setInterval(() => {
       setBlink(true);
-      setTimeout(() => setBlink(false), 140);
+      setTimeout(() => setBlink(false), 130);
     }, 2800 + Math.random() * 2000);
     return () => clearInterval(blinkInterval);
   }, []);
 
-  const s = size || 160;
+  const s = size || 170;
   const cx = s / 2;
-  const cy = s / 2;
-  const r = s * 0.36;
+  const cy = s * 0.46;
+  const r = s * 0.32;
+  const isLongHair = person.female;
 
   return (
-    <svg width={s} height={s} viewBox={`0 0 ${s} ${s}`}>
-      <circle cx={cx} cy={cy} r={s * 0.47} fill={person.color} opacity="0.15" />
-      <ellipse cx={cx} cy={cy - r * 0.75} rx={r * 1.05} ry={r * 0.5} fill={person.hair} />
-      <ellipse cx={cx} cy={cy + s * 0.02} rx={r} ry={r * 1.15} fill={person.skin} />
-      <ellipse cx={cx - r * 0.35} cy={cy - r * 0.1} rx={r * 0.16} ry={blink ? 1.5 : r * 0.13} fill="#1a1a1a" />
-      <ellipse cx={cx + r * 0.35} cy={cy - r * 0.1} rx={r * 0.16} ry={blink ? 1.5 : r * 0.13} fill="#1a1a1a" />
-      <path d={`M${cx - r * 0.45},${cy - r * 0.32} Q${cx - r * 0.35},${cy - r * 0.42} ${cx - r * 0.2},${cy - r * 0.32}`} stroke={person.hair} strokeWidth={s * 0.015} fill="none" strokeLinecap="round" />
-      <path d={`M${cx + r * 0.2},${cy - r * 0.32} Q${cx + r * 0.35},${cy - r * 0.42} ${cx + r * 0.45},${cy - r * 0.32}`} stroke={person.hair} strokeWidth={s * 0.015} fill="none" strokeLinecap="round" />
+    <svg width={s} height={s * 1.05} viewBox={`0 0 ${s} ${s * 1.05}`}>
+      <defs>
+        <radialGradient id={`skin${uid}`} cx="42%" cy="35%" r="75%">
+          <stop offset="0%" stopColor={person.skin} />
+          <stop offset="100%" stopColor={person.skinDark} />
+        </radialGradient>
+        <linearGradient id={`hair${uid}`} x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor={person.hairHi} />
+          <stop offset="60%" stopColor={person.hair} />
+        </linearGradient>
+      </defs>
+
+      <ellipse cx={cx} cy={s * 0.98} rx={r * 1.15} ry={r * 0.5} fill={`url(#hair${uid})`} opacity="0.9" />
+      <path d={`M${cx - r * 0.75},${s * 0.86} Q${cx},${s * 0.72} ${cx + r * 0.75},${s * 0.86} L${cx + r * 0.65},${s * 1.03} L${cx - r * 0.65},${s * 1.03} Z`} fill={`url(#skin${uid})`} />
+
+      {isLongHair && (
+        <path d={`M${cx - r * 1.1},${cy - r * 0.2} Q${cx - r * 1.3},${cy + r * 1.1} ${cx - r * 0.9},${s * 0.95} L${cx - r * 0.6},${s * 0.9} Q${cx - r * 0.95},${cy + r * 0.4} ${cx - r * 0.85},${cy - r * 0.1} Z`} fill={`url(#hair${uid})`} />
+      )}
+      {isLongHair && (
+        <path d={`M${cx + r * 1.1},${cy - r * 0.2} Q${cx + r * 1.3},${cy + r * 1.1} ${cx + r * 0.9},${s * 0.95} L${cx + r * 0.6},${s * 0.9} Q${cx + r * 0.95},${cy + r * 0.4} ${cx + r * 0.85},${cy - r * 0.1} Z`} fill={`url(#hair${uid})`} />
+      )}
+
+      <ellipse cx={cx} cy={cy} rx={r} ry={r * 1.18} fill={`url(#skin${uid})`} />
+
+      <path d={`M${cx - r * 1.05},${cy - r * 0.15} Q${cx - r * 1.1},${cy - r * 1.15} ${cx},${cy - r * 1.25} Q${cx + r * 1.1},${cy - r * 1.15} ${cx + r * 1.05},${cy - r * 0.15} Q${cx + r * 0.85},${cy - r * 0.55} ${cx},${cy - r * 0.62} Q${cx - r * 0.85},${cy - r * 0.55} ${cx - r * 1.05},${cy - r * 0.15} Z`} fill={`url(#hair${uid})`} />
+
+      <path d={`M${cx - r * 0.42},${cy - r * 0.32} Q${cx - r * 0.28},${cy - r * 0.42} ${cx - r * 0.12},${cy - r * 0.33}`} stroke={person.hair} strokeWidth={s * 0.012} fill="none" strokeLinecap="round" />
+      <path d={`M${cx + r * 0.12},${cy - r * 0.33} Q${cx + r * 0.28},${cy - r * 0.42} ${cx + r * 0.42},${cy - r * 0.32}`} stroke={person.hair} strokeWidth={s * 0.012} fill="none" strokeLinecap="round" />
+
+      <ellipse cx={cx - r * 0.34} cy={cy - r * 0.05} rx={r * 0.15} ry={blink ? s * 0.006 : r * 0.1} fill="#fff" />
+      <ellipse cx={cx + r * 0.34} cy={cy - r * 0.05} rx={r * 0.15} ry={blink ? s * 0.006 : r * 0.1} fill="#fff" />
+      {!blink && (
+        <>
+          <circle cx={cx - r * 0.34} cy={cy - r * 0.05} r={r * 0.075} fill="#3a2818" />
+          <circle cx={cx + r * 0.34} cy={cy - r * 0.05} r={r * 0.075} fill="#3a2818" />
+          <circle cx={cx - r * 0.31} cy={cy - r * 0.09} r={r * 0.022} fill="#fff" opacity="0.9" />
+          <circle cx={cx + r * 0.37} cy={cy - r * 0.09} r={r * 0.022} fill="#fff" opacity="0.9" />
+        </>
+      )}
+
+      <path d={`M${cx - r * 0.06},${cy + r * 0.05} Q${cx},${cy + r * 0.2} ${cx + r * 0.02},${cy + r * 0.28}`} stroke={person.skinDark} strokeWidth={s * 0.008} fill="none" strokeLinecap="round" opacity="0.6" />
+
+      <ellipse cx={cx - r * 0.5} cy={cy + r * 0.18} rx={r * 0.16} ry={r * 0.08} fill={person.color} opacity="0.18" />
+      <ellipse cx={cx + r * 0.5} cy={cy + r * 0.18} rx={r * 0.16} ry={r * 0.08} fill={person.color} opacity="0.18" />
+
       <path
         d={mouthOpen
-          ? `M${cx - r * 0.22},${cy + r * 0.42} Q${cx},${cy + r * 0.62} ${cx + r * 0.22},${cy + r * 0.42}`
-          : `M${cx - r * 0.2},${cy + r * 0.42} Q${cx},${cy + r * 0.5} ${cx + r * 0.2},${cy + r * 0.42}`}
-        stroke="#7a3b2e"
-        strokeWidth={s * 0.02}
-        fill={mouthOpen ? "#5a2a20" : "none"}
-        strokeLinecap="round"
+          ? `M${cx - r * 0.2},${cy + r * 0.42} Q${cx},${cy + r * 0.58} ${cx + r * 0.2},${cy + r * 0.42} Q${cx},${cy + r * 0.5} ${cx - r * 0.2},${cy + r * 0.42}`
+          : `M${cx - r * 0.19},${cy + r * 0.42} Q${cx},${cy + r * 0.47} ${cx + r * 0.19},${cy + r * 0.42}`}
+        fill={mouthOpen ? "#4a2018" : person.lip}
+        stroke={person.lip}
+        strokeWidth={s * 0.006}
       />
+
       {speaking && (
-        <circle cx={cx} cy={cy} r={s * 0.49} fill="none" stroke={person.color} strokeWidth={s * 0.012} opacity="0.6">
-          <animate attributeName="r" values={`${s * 0.47};${s * 0.5};${s * 0.47}`} dur="0.8s" repeatCount="indefinite" />
-          <animate attributeName="opacity" values="0.6;0.1;0.6" dur="0.8s" repeatCount="indefinite" />
+        <circle cx={cx} cy={cy} r={s * 0.5} fill="none" stroke={person.color} strokeWidth={s * 0.01} opacity="0.55">
+          <animate attributeName="r" values={`${s * 0.48};${s * 0.52};${s * 0.48}`} dur="0.8s" repeatCount="indefinite" />
+          <animate attributeName="opacity" values="0.55;0.1;0.55" dur="0.8s" repeatCount="indefinite" />
         </circle>
       )}
     </svg>
@@ -282,7 +321,7 @@ export default function App() {
 
         {videoOpen && (
           <div style={{ background: "#12121e", padding: "20px 16px", textAlign: "center", borderBottom: "1px solid #2a2a38", position: "relative" }}>
-            <FaceAvatar person={person} speaking={speaking} size={160} />
+            <FaceAvatar person={person} speaking={speaking} size={170} />
             <div style={{ fontWeight: 700, fontSize: 18, marginTop: 6 }}>{person.name}</div>
             <div style={{ fontSize: 12, color: person.color, marginTop: 4, marginBottom: 12 }}>
               {speaking ? "Speaking..." : "Connected - Live"}
