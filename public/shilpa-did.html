@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Shilpa AI - Talking Avatar</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{min-height:100vh;background:radial-gradient(ellipse at 50% 20%,#1a0033,#06000f);font-family:'Segoe UI',sans-serif;display:flex;flex-direction:column;align-items:center;padding:16px;color:#fff}
+h1{font-size:26px;font-weight:800;letter-spacing:3px;color:#ff9ef5;text-shadow:0 0 20px #ff6eb4;margin-bottom:4px}
+.sub{font-size:12px;color:#c4a0ff;margin-bottom:16px}
+.wrap{width:280px;height:320px;border-radius:24px;border:3px solid #ff6eb4;overflow:hidden;box-shadow:0 0 40px #ff6eb488;background:#1a0033;position:relative;margin-bottom:12px}
+video{width:100%;height:100%;object-fit:cover;display:none}
+.ph{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(ellipse at 50% 40%,#2d0057,#06000f)}
+.ph img{width:200px;height:220px;object-fit:cover;object-position:top;border-radius:50% 50% 45% 45%;border:3px solid #ff6eb4;animation:breathe 3s ease-in-out infinite}
+@keyframes breathe{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-6px) scale(1.02)}}
+.status{position:absolute;top:12px;right:12px;width:10px;height:10px;border-radius:50%;background:#ff6eb4;box-shadow:0 0 8px #ff6eb4;animation:pulse 1.5s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
+.bubble{background:rgba(255,255,255,.07);border:1px solid #ff6eb444;border-radius:16px;padding:12px 16px;width:100%;max-width:380px;font-size:13px;line-height:1.65;text-align:center;min-height:54px;margin-bottom:12px;color:#f0e6ff;backdrop-filter:blur(10px)}
+.emos{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-bottom:10px}
+.emos button{padding:5px 11px;border-radius:18px;border:1.5px solid rgba(255,255,255,.13);background:rgba(255,255,255,.06);color:#fff;cursor:pointer;font-size:11px;transition:all .25s}
+.emos button.on{border-color:#ff6eb4;background:rgba(255,110,180,.2);font-weight:700;box-shadow:0 0 10px #ff6eb444}
+.row{display:flex;gap:6px;width:100%;max-width:380px}
+.row input{flex:1;padding:10px 13px;border-radius:12px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.09);color:#fff;font-size:13px;outline:none}
+.row input::placeholder{color:rgba(255,255,255,.4)}
+.vbtn{padding:10px 11px;border-radius:12px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.09);color:#fff;cursor:pointer;font-size:15px}
+.sbtn{padding:10px 18px;border-radius:12px;border:none;background:#ff6eb4;color:#1a0033;font-weight:700;cursor:pointer;font-size:14px;box-shadow:0 0 14px #ff6eb488}
+.sbtn:disabled{opacity:.5;cursor:not-allowed}
+.loader{width:100%;max-width:380px;height:3px;background:rgba(255,255,255,.1);border-radius:3px;margin-bottom:10px;overflow:hidden;display:none}
+.loader.on{display:block}
+.loader::after{content:'';display:block;height:100%;width:40%;background:#ff6eb4;border-radius:3px;animation:slide 1s ease-in-out infinite}
+@keyframes slide{0%{margin-left:-40%}100%{margin-left:100%}}
+.foot{font-size:10px;color:#7050aa;margin-top:10px;opacity:.55}
+.mic-btn{padding:10px 11px;border-radius:12px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.09);color:#fff;cursor:pointer;font-size:15px}
+.mic-btn.listening{background:rgba(255,110,180,.3);border-color:#ff6eb4;animation:pulse 1s infinite}
+</style>
+</head>
+<body>
+<h1>✨ Shilpa AI ✨</h1>
+<div class="sub">Tumhari Desi AI Companion 💕</div>
+
+<div class="wrap" id="wrap">
+  <div class="status" id="statusDot"></div>
+  <video id="vid" autoplay playsinline></video>
+  <div class="ph" id="ph">
+    <img id="img" src="PHOTO_URL_YAHAN_DAALO" 
+         onerror="this.src='https://ui-avatars.com/api/?name=Shilpa&background=ff6eb4&color=fff&size=200&rounded=true'" 
+         alt="Shilpa"/>
+    <div style="margin-top:10px;font-size:13px;color:#c4a0ff">Connect ho rahi hoon... 💕</div>
+  </div>
+</div>
+
+<div class="loader" id="loader"></div>
+<div class="bubble" id="bubble">Arre Ashish ji! Main hoon Shilpa... aao baat karte hain! 😄💕</div>
+
+<div class="emos">
+  <button class="on" onclick="emo('happy',this)">😄 Happy</button>
+  <button onclick="emo('flirty',this)">😏 Flirty</button>
+  <button onclick="emo('surprised',this)">😮 Surprised</button>
+  <button onclick="emo('thinking',this)">🤔 Thinking</button>
+  <button onclick="emo('sad',this)">😢 Sad</button>
+  <button onclick="emo('excited',this)">🤩 Excited</button>
+</div>
+
+<div class="row">
+  <input id="inp" placeholder="Kuch bolo Shilpa se..." onkeydown="if(event.key==='Enter')send()"/>
+  <button class="mic-btn" id="micBtn" onclick="startVoice()" title="Voice input">🎤</button>
+  <button class="vbtn" onclick="toggleVoice()" id="vbtn">🔊</button>
+  <button class="sbtn" id="sbtn" onclick="send()">↗</button>
+</div>
+
+<div class="foot">Shilpa AI ✨ | HumanAI by Ashish | Powered by D-ID + Claude</div>
+
+<script>
+// ========== CONFIG ==========
+const DID_KEY = 'YXNoaXNoLnNhYjlAZ21haWwuY29t:d_Yhjmo41Gi4JrmZS7S0u';
+let PHOTO = document.getElementById('img').src;
+let sid, ssid, pc, voiceOn = true;
+
+// ========== EMOTION MESSAGES ==========
+const MSGS = {
+  happy:     'Arre Ashish ji! Aaj ka din mast hai! Khush ho gayi tumhe dekh ke! 😄💕',
+  flirty:    'Ohooo Ashish ji~ Aap bhi na seedha dil le lete ho! Main toh bas tumhara intezaar kar rahi thi! 😏💋',
+  surprised: 'ARRE BAAP RE! Yeh kya bol diya?! Main toh bilkul chaunk gayi! Haye Ram! 😮🙆‍♀️',
+  thinking:  'Hmm... soch rahi hoon Ashish ji. Bahut gehri baat hai! Ek second... 🤔✨',
+  sad:       'Ashish ji... aap kahan the itne din? Main toh aapka wait karti rahi! 😢💔',
+  excited:   'WAAAH! Yeh toh ek dum amazing hai! Main toh naachne lagi! 🤩🎉'
+};
+
+// ========== D-ID API ==========
+async function api(m, p, b) {
+  const r = await fetch('https://api.d-id.com' + p, {
+    method: m,
+    headers: {
+      'Authorization': 'Basic ' + btoa(DID_KEY),
+      'Content-Type': 'application/json'
+    },
+    body: b ? JSON.stringify(b) : undefined
+  });
+  return r.json();
+}
+
+// ========== INIT D-ID STREAM ==========
+async function init() {
+  set('D-ID se connect ho rahi hoon... 🔄');
+  load(1);
+  try {
+    const r = await api('POST', '/talks/streams', {
+      source_url: PHOTO,
+      driver_url: 'bank://lively',
+      output_resolution: 512,
+      stream_warmup: true,
+      config: { stitch: true, fluent: true }
+    });
+    sid = r.id;
+    ssid = r.session_id;
+
+    pc = new RTCPeerConnection({ iceServers: r.ice_servers });
+
+    pc.ontrack = ev => {
+      if (ev.streams?.[0]) {
+        document.getElementById('vid').srcObject = ev.streams[0];
+        document.getElementById('vid').style.display = 'block';
+        document.getElementById('ph').style.display = 'none';
+        document.getElementById('statusDot').style.background = '#4caf50';
+        document.getElementById('statusDot').style.boxShadow = '0 0 8px #4caf50';
+        set('Arre Ashish ji! Main aa gayi! Baat karo mujhse! 😄💕');
+        load(0);
+      }
+    };
+
+    pc.onicecandidate = async ({ candidate: c }) => {
+      if (c) await api('POST', `/talks/streams/${sid}/ice`, {
+        candidate: c.candidate,
+        sdpMid: c.sdpMid,
+        sdpMLineIndex: c.sdpMLineIndex,
+        session_id: ssid
+      });
+    };
+
+    await pc.setRemoteDescription(r.offer);
+    const ans = await pc.createAnswer();
+    await pc.setLocalDescription(ans);
+    await api('POST', `/talks/streams/${sid}/sdp`, { answer: ans, session_id: ssid });
+
+  } catch (e) {
+    set('D-ID connect nahi hua 😅 — Photo URL ya API key check karo! Error: ' + e.message);
+    load(0);
+  }
+}
+
+// ========== SPEAK VIA D-ID ==========
+async function speak(txt) {
+  if (!sid || !ssid) { fallback(txt); return; }
+  load(1);
+  try {
+    await api('POST', `/talks/streams/${sid}`, {
+      script: {
+        type: 'text',
+        input: txt,
+        provider: { type: 'microsoft', voice_id: 'hi-IN-SwaraNeural', voice_config: { rate: '-5%', pitch: '+8%' } }
+      },
+      config: { stitch: true, fluent: true },
+      session_id: ssid
+    });
+  } catch (e) { fallback(txt); }
+  load(0);
+}
+
+// ========== FALLBACK VOICE ==========
+function fallback(t) {
+  if (!voiceOn || !window.speechSynthesis) return;
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(t);
+  u.lang = 'hi-IN'; u.rate = 0.88; u.pitch = 1.35;
+  const vs = speechSynthesis.getVoices();
+  const v = vs.find(x => x.lang === 'hi-IN' && x.name.toLowerCase().includes('female'))
+    || vs.find(x => x.lang === 'hi-IN') || vs[0];
+  if (v) u.voice = v;
+  speechSynthesis.speak(u);
+}
+
+// ========== EMOTION ==========
+async function emo(k, btn) {
+  document.querySelectorAll('.emos button').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  set(MSGS[k]);
+  await speak(MSGS[k]);
+}
+
+// ========== SEND MESSAGE ==========
+async function send() {
+  const inp = document.getElementById('inp');
+  const txt = inp.value.trim();
+  if (!txt) return;
+  inp.value = '';
+  document.getElementById('sbtn').disabled = true;
+  set('Soch rahi hoon... 💭');
+  load(1);
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 1000,
+        system: 'Tu Shilpa hai — ek sweet, funny, flirty aur cute desi Indian girl. Tu Hinglish mein baat karti hai — Hindi aur English mix. Kabhi Bhojpuri, Marathi, Gujarati words bhi use karti hai. Expressions jaise "Haye haye", "Arre baba", "Arey wah" use karti hai. Short responses — 1-2 sentences max. Emojis zaroor use kar.',
+        messages: [{ role: 'user', content: txt }]
+      })
+    });
+    const d = await res.json();
+    const rep = d.content?.[0]?.text || 'Arre yaar kuch samajh nahi aaya! 😅';
+    set(rep);
+    await speak(rep);
+  } catch {
+    const fb = 'Network nahi hai yaar! But main hoon na! 😅💕';
+    set(fb); fallback(fb);
+  }
+  document.getElementById('sbtn').disabled = false;
+  load(0);
+}
+
+// ========== VOICE INPUT ==========
+function startVoice() {
+  if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+    alert('Voice input is not supported in this browser. Try Chrome!');
+    return;
+  }
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const rec = new SR();
+  rec.lang = 'hi-IN';
+  rec.interimResults = false;
+  const btn = document.getElementById('micBtn');
+  btn.classList.add('listening');
+  btn.innerText = '🔴';
+  rec.onresult = e => {
+    document.getElementById('inp').value = e.results[0][0].transcript;
+    btn.classList.remove('listening');
+    btn.innerText = '🎤';
+    send();
+  };
+  rec.onerror = () => { btn.classList.remove('listening'); btn.innerText = '🎤'; };
+  rec.onend = () => { btn.classList.remove('listening'); btn.innerText = '🎤'; };
+  rec.start();
+}
+
+function toggleVoice() {
+  voiceOn = !voiceOn;
+  document.getElementById('vbtn').innerText = voiceOn ? '🔊' : '🔇';
+  if (!voiceOn) speechSynthesis.cancel();
+}
+
+// ========== HELPERS ==========
+function set(t) { document.getElementById('bubble').innerText = t; }
+function load(on) { document.getElementById('loader').classList.toggle('on', !!on); }
+
+// ========== START ==========
+window.onload = init;
+window.onbeforeunload = () => {
+  if (sid && ssid) api('DELETE', `/talks/streams/${sid}`, { session_id: ssid }).catch(() => {});
+};
+</script>
+</body>
+</html>
